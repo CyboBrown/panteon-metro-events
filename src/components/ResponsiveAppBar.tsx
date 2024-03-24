@@ -17,7 +17,16 @@ import SimpleBadge from "./SimpleBadge";
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-function ResponsiveAppBar() {
+interface ResponsiveAppBarProps {
+  notifNumber: number;
+  callBackClearNotif: () => void;
+  notifList: any;
+}
+
+const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ notifNumber, callBackClearNotif, notifList }) => {
+
+  //Most parts are subjects to change, skip to Line 142 then ".SimpleBadge.tsx"
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -130,7 +139,7 @@ function ResponsiveAppBar() {
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            <SimpleBadge/>
+            <SimpleBadge notifNumber={notifNumber} callBackClearNotif={callBackClearNotif} notifList={notifList}/>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
