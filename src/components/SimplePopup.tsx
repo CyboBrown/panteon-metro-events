@@ -1,6 +1,9 @@
 import * as React from "react";
 import { Unstable_Popup as BasePopup } from "@mui/base/Unstable_Popup";
 import { styled } from "@mui/system";
+import { ListItemText, Typography, ListItem, ButtonBase } from "@mui/material";
+import { List } from "@mui/material";
+import { Divider } from "@mui/material";
 
 
 interface SimplePopupProp {
@@ -25,16 +28,47 @@ const SimplePopup: React.FC<SimplePopupProp> = ({ anchor, open, id, notifList })
 
   return (
     <div>
-        <BasePopup id={id} open={open} anchor={anchor} placement="bottom-end">
+        <BasePopup 
+        id={id}
+        open={open} 
+        anchor={anchor} 
+        placement="bottom-end"
+        >
           <PopupBody>
+            <List sx={{ width: 250, maxHeight: 400, overflow: 'auto', bgcolor: 'background.paper' }}>
             {//map out notifList from ".Home.tsx"
             //Subject to change, scroll wheel and styling css
-            notifList.map((curr: any) => (
-                <div>
-                    <h2>{curr.title}</h2>
-                    <h2>{curr.description}</h2>
-                </div>
+            notifList.map((curr: any, index: any) => (
+              <React.Fragment key={index}>
+                <ListItem 
+                  alignItems="flex-start"
+                  sx={{ 
+                    cursor: 'pointer',
+                    '&:hover': {
+                      boxShadow: '0 0 10px 0 rgba(0,0,0,0.3)'
+                    }
+                  }}
+                  >
+                  <ListItemText
+                    sx={{ maxHeight: 400 }}
+                    primary={curr.title}
+                    secondary={
+                      <React.Fragment>
+                        <Typography
+                          sx={{ display: 'inline' }}
+                          component="span"
+                          variant="body2"
+                          color="text.primary">
+                            {curr.description}
+                        </Typography>
+                      </React.Fragment>
+                    }>
+                  </ListItemText>
+                </ListItem>
+                <Divider />
+              </React.Fragment>
             ))}
+            </List>
           </PopupBody>
         </BasePopup>
     </div>
