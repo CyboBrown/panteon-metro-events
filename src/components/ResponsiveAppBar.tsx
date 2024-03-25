@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../client";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -23,7 +25,12 @@ interface ResponsiveAppBarProps {
   notifList: any;
 }
 
-const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ notifNumber, callBackClearNotif, notifList }) => {
+const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({
+  notifNumber,
+  callBackClearNotif,
+  notifList,
+}) => {
+  let navigate = useNavigate();
 
   //Most parts are subjects to change, skip to Line 142 then ".SimpleBadge.tsx"
 
@@ -45,7 +52,17 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ notifNumber, callBa
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = async (setting: string) => {
+    if (setting === "Logout") {
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        sessionStorage.removeItem("token");
+        navigate("/signin");
+      } catch (error) {
+        alert(error);
+      }
+    }
     setAnchorElUser(null);
   };
 
@@ -62,14 +79,14 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ notifNumber, callBa
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
+              fontFamily: "sans-serif",
               fontWeight: 700,
-              letterSpacing: ".3rem",
+              letterSpacing: ".1rem",
               color: "inherit",
               textDecoration: "none",
             }}
           >
-            LOGO
+            METRO EVENTS
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -125,7 +142,7 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ notifNumber, callBa
               textDecoration: "none",
             }}
           >
-            LOGO
+            Metro Events
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
@@ -139,7 +156,11 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ notifNumber, callBa
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            <SimpleBadge notifNumber={notifNumber} callBackClearNotif={callBackClearNotif} notifList={notifList}/>
+            <SimpleBadge
+              notifNumber={notifNumber}
+              callBackClearNotif={callBackClearNotif}
+              notifList={notifList}
+            />
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
@@ -162,7 +183,10 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ notifNumber, callBa
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem
+                  key={setting}
+                  onClick={() => handleCloseUserMenu(setting)}
+                >
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
@@ -172,5 +196,5 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ notifNumber, callBa
       </Container>
     </AppBar>
   );
-}
+};
 export default ResponsiveAppBar;
