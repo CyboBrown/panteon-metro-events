@@ -1,6 +1,4 @@
 // import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "../client";
 import {
   Avatar,
   Button,
@@ -38,29 +36,13 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-  let navigate = useNavigate();
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formdata = new FormData(event.currentTarget);
-
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formdata.get("email"),
-        password: formdata.get("password"),
-        options: {
-          data: {
-            first_name: formdata.get("firstName"),
-            last_name: formdata.get("lastName"),
-          },
-        },
-      });
-      console.log(data);
-      navigate("/signin");
-      if (error) throw error;
-    } catch (error) {
-      alert(error);
-    }
+    const data = new FormData(event.currentTarget);
+    console.log({
+      email: data.get("email"),
+      password: data.get("password"),
+    });
   };
 
   return (
