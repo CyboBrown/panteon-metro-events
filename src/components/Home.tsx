@@ -47,6 +47,54 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   console.log(token);
 
+  const handleJoinEvent = async (eventId) => {
+    try {
+      // Send a request to the server to join the event
+      const response = await fetch(`/join-event/${eventId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: token.user.id,
+        }),
+      });
+  
+      if (response.ok) {
+        alert('You have successfully joined the event!');
+      } else {
+        alert('Failed to join the event. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Error joining event:', error);
+      alert('An error occurred while joining the event. Please try again later.');
+    }
+  };
+
+  const handleBecomeOrganizer = async () => {
+    try {
+      // Send a request to the server to become an organizer
+      const response = await fetch('/client.ts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: token.user.id,
+          message: 'Please consider me as an organizer.', 
+        }),
+      });
+  
+      if (response.ok) {
+        alert('Your request to become an organizer has been submitted successfully.');
+      } else {
+        alert('Failed to submit the request. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Error submitting organizer request:', error);
+      alert('An error occurred while submitting the request. Please try again later.');
+    }
+  };
 
   return (
     <>
@@ -69,10 +117,11 @@ const Home: React.FC<HomeProps> = ({ token }) => {
             <IconButton aria-label="thumbs up">
               <Upvote/>
             </IconButton>
-            <Button variant="contained"> Join Event </Button>
+            <Button variant="contained" onClick={() => handleJoinEvent(event.id)}> Join Event </Button>
             </CardContent>
           </Card>
-          <Button variant="contained" sx={{mt: 5}}> Become an Organizer </Button>
+          <p>{token.user.isOrganizer ? "You are an organizer." : "You are not an organizer."}</p>
+          <Button variant="contained" onClick={handleBecomeOrganizer} sx={{mt: 5}}> Become an Organizer </Button>
       </Grid>
     </>
   );
