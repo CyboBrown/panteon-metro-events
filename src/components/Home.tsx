@@ -1,5 +1,8 @@
+import { Button, Card, CardContent, Grid } from "@mui/material";
 import { useState, useEffect } from "react";
+import Upvote from '@mui/icons-material/ThumbUpOutlined';
 import ResponsiveAppBar from "./ResponsiveAppBar";
+import IconButton from "@mui/material/IconButton";
 
 //subject to change (ids and event redirect/popup/data)
 interface Notif {
@@ -39,10 +42,28 @@ export default function Home() {
     console.log(notifList);
   }, [notifList])
 
+
   return (
     <>
       <ResponsiveAppBar notifNumber={notifNumber} callBackClearNotif={clearNotif} notifList={notifList}/>
       <button onClick={handleTestButtonOnClick}>Add Notif Button</button>
+      <Grid container spacing={2}
+        direction="column"
+        justifyContent="center"
+        alignItems="center">
+          <h1> Event List </h1>
+          <Card>
+            <CardContent>
+            <h2> Event 1</h2>
+            <h4> Details chu chu chu</h4>
+            <IconButton aria-label="thumbs up">
+              <Upvote/>
+            </IconButton>
+            <Button variant="contained"> Join Event </Button>
+            </CardContent>
+          </Card>
+          <Button variant="contained" sx={{mt: 5}}> Become an Organizer </Button>
+      </Grid>
     </>
   );
 }
