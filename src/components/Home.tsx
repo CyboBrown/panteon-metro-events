@@ -10,7 +10,11 @@ interface Notif {
   description: string;
 }
 
-export default function Home({ token }) {
+interface HomeProps {
+  token: any;
+}
+
+const Home: React.FC<HomeProps> = ({ token }) => {
   const [notifNumber, setNotifNumber] = useState(0);
   const [notifList, setNotifList] = useState<Notif[]>([]);
 
@@ -73,3 +77,4 @@ export default function Home({ token }) {
     </>
   );
 }
+export default Home
