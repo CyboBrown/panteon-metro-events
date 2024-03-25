@@ -40,6 +40,7 @@ const SimplePopup: React.FC<SimplePopupProp> = ({ anchor, open, id, notifList })
             //Subject to change, scroll wheel and styling css
             notifList.map((curr: any, index: any) => (
               <React.Fragment key={index}>
+                <ButtonBase sx={{ width: '100%' }}>
                 <ListItem 
                   alignItems="flex-start"
                   sx={{ 
@@ -64,7 +65,9 @@ const SimplePopup: React.FC<SimplePopupProp> = ({ anchor, open, id, notifList })
                       </React.Fragment>
                     }>
                   </ListItemText>
+                  
                 </ListItem>
+                </ButtonBase>
                 <Divider />
               </React.Fragment>
             ))}

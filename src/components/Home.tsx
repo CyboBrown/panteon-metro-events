@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <>
       <ResponsiveAppBar notifNumber={notifNumber} callBackClearNotif={clearNotif} notifList={notifList}/>
-      <button onClick={handleTestButtonOnClick}>Add Notif Button</button>
+      <button onClick={handleTestButtonOnClick}>Add Notif</button>
     </>
   );
 }

@@ -21,9 +21,11 @@ const SimpleBadge: React.FC<SimpleBadgeProps> = ({ notifNumber, callBackClearNot
 
   //Popup event
   const onClickHandler = (event: any) => {
-    setAnchor(anchor ? null : event.currentTarget);
-    callBackClearNotif();
-    console.log("Notification Clicked");
+    if(!(Object.keys(notifList).length === 0)){
+      setAnchor(anchor ? null : event.currentTarget);
+      callBackClearNotif();
+      console.log("Notification Clicked");
+    }
   }
 
   //Tied to setAnchor, sends data to popup component to spawn popup at location. See ".SimplePopup"
