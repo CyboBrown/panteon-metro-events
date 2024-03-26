@@ -42,7 +42,9 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   //Debugging
   useEffect(() => {
+    console.log("Notif List: {")
     console.log(notifList);
+    console.log("}")
   }, [notifList]);
 
   console.log(token);
