@@ -245,3 +245,32 @@ export const upvoteEvent = async (user_id: string, event_id: number) => {
   if (error) console.log("CRUD Error: " + error);
   return data;
 };
+
+export const isOrganizer = async (user_id: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("administrators")
+      .select("is_accepted")
+      .eq("user_id", user_id)
+      .single();
+
+    if (error) {
+      console.log("CRUD Error: " + error.message);
+      return false;
+    }
+    if (data) {
+      if (data.is_accepted === true) {
+        return true;
+      } else if (data.is_accepted === false) {
+        return false;
+      } else {
+        return null;
+      }
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.error("Error:", error.message);
+    return false;
+  }
+};

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Upvote from "@mui/icons-material/ThumbUpOutlined";
 import ResponsiveAppBar from "./ResponsiveAppBar";
 import IconButton from "@mui/material/IconButton";
-import { getNotifs, requestOrganizer } from "../operations";
+import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator } from "../operations";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../client";
 
@@ -76,35 +76,36 @@ const Home: React.FC<HomeProps> = ({ token }) => {
   }, [notifList]);
 
   console.log(token);
-
-  const handleJoinEvent = async (eventId) => {
-    try {
-      // Send a request to the server to join the event
-      const response = await fetch(`/join-event/${eventId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: token.user.id,
-        }),
-      });
-
-      if (response.ok) {
-        alert("You have successfully joined the event!");
-      } else {
-        alert("Failed to join the event. Please try again later.");
-      }
-    } catch (error) {
-      console.error("Error joining event:", error);
-      alert(
-        "An error occurred while joining the event. Please try again later."
-      );
+  //
+  const handleJoinEvent = async (event_id: number) => { 
+    const response = await requestOrganizer(token.user.id);
+    console.log(response);
+    if (response) {
+      alert('Request to join event has been submitted for approval.');
+    } else {
+      alert('Request already sent! Please wait for approval.');
     }
-  };
+  }
 
+  //
   const handleBecomeOrganizer = async () => {
-    requestOrganizer(token.user.id);
+      const response = await requestAdministrator(token.user.id);
+      console.log(response);
+      if(await isOrganizer(token.user.id) == true) {
+        setNotifNumber(notifNumber + 1);
+        addNotif("User Status", "Request to to become an Organizer has been approved!");
+      } else if(await isOrganizer(token.user.id) == false) {
+        setNotifNumber(notifNumber + 1);
+        addNotif("User Status", "Request to to become an Organizer has been rejected!");
+      } else if(await isOrganizer(token.user.id) == null) {
+        setNotifNumber(notifNumber + 1);
+        addNotif("User Status", "Request to to become an Organizer is pending!");
+      } 
+      else if (response) {
+        alert('Request to become an organizer has been submitted for approval.');
+      } else {
+        alert('Request already sent! Please wait for approval.');
+      }
   };
 
   return (
@@ -133,18 +134,13 @@ const Home: React.FC<HomeProps> = ({ token }) => {
             </IconButton>
             <Button
               variant="contained"
-              onClick={() => handleJoinEvent(event.id)}
+              onClick={handleJoinEvent}
             >
               {" "}
               Join Event{" "}
             </Button>
           </CardContent>
         </Card>
-        <p>
-          {token.user.isOrganizer
-            ? "You are an organizer."
-            : "You are not an organizer."}
-        </p>
         <Button
           variant="contained"
           onClick={handleBecomeOrganizer}
