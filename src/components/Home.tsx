@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import { getNotifs } from "../operations";
 
 //subject to change (ids and event redirect/popup/data)
-export interface Notif {
+interface Notif {
   title: string;
   description: string;
 }
@@ -19,9 +19,13 @@ const Home: React.FC<HomeProps> = ({ token }) => {
   const [notifNumber, setNotifNumber] = useState(0);
   const [notifList, setNotifList] = useState<Notif[]>([]);
 
-  // setNotifList(getNotifs(token.user.id));
-  console.log("This one CC: ");
-  console.log(getNotifs(token.user.id));
+  useEffect(() => {
+    getNotifs(token.user.id)
+      .then(data => {
+        setNotifList(data);
+        //ignore typescript things
+      })
+  }, [])
 
   //For notif button callback see ".SimpleBadge.tsx Line 23"
   const clearNotif = () => {
