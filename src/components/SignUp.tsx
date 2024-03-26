@@ -56,8 +56,8 @@ export default function SignUp() {
         },
       });
       console.log(data);
-      navigate("/signin");
       if (error) throw error;
+      navigate("/signin");
     } catch (error) {
       alert(error);
     }

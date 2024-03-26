@@ -50,8 +50,8 @@ export default function SignIn({ setToken }) {
       });
       console.log(data);
       setToken(data);
-      navigate("/home");
       if (error) throw error;
+      navigate("/home");
     } catch (error) {
       alert(error);
     }
