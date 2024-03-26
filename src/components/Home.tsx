@@ -4,6 +4,8 @@ import Upvote from "@mui/icons-material/ThumbUpOutlined";
 import ResponsiveAppBar from "./ResponsiveAppBar";
 import IconButton from "@mui/material/IconButton";
 import { getNotifs } from "../operations";
+import { createClient } from '@supabase/supabase-js';
+import { supabase } from "../client";
 
 //subject to change (ids and event redirect/popup/data)
 interface Notif {
@@ -18,6 +20,21 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ token }) => {
   const [notifNumber, setNotifNumber] = useState(0);
   const [notifList, setNotifList] = useState<Notif[]>([]);
+
+  const handleInserts = (payload: any) => {
+    console.log('Change received!', payload)
+    setNotifNumber(notifNumber + 1);
+    getNotifs(token.user.id)
+      .then(data => {
+        setNotifList(data);
+        //ignore typescript things
+      })
+  }
+
+  supabase
+  .channel('notifications')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, handleInserts)
+  .subscribe()
 
   useEffect(() => {
     getNotifs(token.user.id)

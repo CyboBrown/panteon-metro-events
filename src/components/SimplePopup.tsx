@@ -26,6 +26,8 @@ const SimplePopup: React.FC<SimplePopupProp> = ({ anchor, open, id, notifList })
   //   const open = Boolean(anchor);
   //   const id = open ? 'simple-popup' : undefined;
 
+  const reversedNotifList = [...notifList].reverse();
+
   return (
     <div>
         <BasePopup 
@@ -38,7 +40,8 @@ const SimplePopup: React.FC<SimplePopupProp> = ({ anchor, open, id, notifList })
             <List sx={{ width: 250, maxHeight: 400, overflow: 'auto', bgcolor: 'background.paper' }}>
             {//map out notifList from ".Home.tsx"
             //Subject to change, scroll wheel and styling css
-            notifList.map((curr: any, index: any) => (
+            
+            reversedNotifList.map((curr: any, index: any) => (
               <React.Fragment key={index}>
                 <ButtonBase sx={{ width: '100%' }}>
                 <ListItem 
@@ -65,7 +68,6 @@ const SimplePopup: React.FC<SimplePopupProp> = ({ anchor, open, id, notifList })
                       </React.Fragment>
                     }>
                   </ListItemText>
-                  
                 </ListItem>
                 </ButtonBase>
                 <Divider />
