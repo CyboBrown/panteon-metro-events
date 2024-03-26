@@ -15,7 +15,7 @@ interface SimplePopupProp {
 
 const SimplePopup: React.FC<SimplePopupProp> = ({ anchor, open, id, notifList }) => {
 
-  //Some code subject to change and deletion
+  //   Some code subject to change and deletion
   
   //   const [anchor, setAnchor] = React.useState<null | HTMLElement>(null);
 
