@@ -5,7 +5,7 @@ import Index from "./components/Index";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import "./App.css";
-import { supabase } from './client'; 
+import { supabase } from "./client";
 
 export default function App() {
   const [token, setToken] = useState(false);
@@ -24,7 +24,7 @@ export default function App() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
-  
+
   return (
     <>
       <BrowserRouter>

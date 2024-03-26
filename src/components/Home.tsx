@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import Upvote from "@mui/icons-material/ThumbUpOutlined";
 import ResponsiveAppBar from "./ResponsiveAppBar";
 import IconButton from "@mui/material/IconButton";
-import { getNotifs } from "../operations";
-import { createClient } from '@supabase/supabase-js';
+import { getNotifs, requestOrganizer } from "../operations";
+import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../client";
 
 //subject to change (ids and event redirect/popup/data)
@@ -22,27 +22,29 @@ const Home: React.FC<HomeProps> = ({ token }) => {
   const [notifList, setNotifList] = useState<Notif[]>([]);
 
   const handleInserts = (payload: any) => {
-    console.log('Change received!', payload)
+    console.log("Change received!", payload);
     setNotifNumber(notifNumber + 1);
-    getNotifs(token.user.id)
-      .then(data => {
-        setNotifList(data);
-        //ignore typescript things
-      })
-  }
+    getNotifs(token.user.id).then((data) => {
+      setNotifList(data);
+      //ignore typescript things
+    });
+  };
 
   supabase
-  .channel('notifications')
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, handleInserts)
-  .subscribe()
+    .channel("notifications")
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "notifications" },
+      handleInserts
+    )
+    .subscribe();
 
   useEffect(() => {
-    getNotifs(token.user.id)
-      .then(data => {
-        setNotifList(data);
-        //ignore typescript things
-      })
-  }, [])
+    getNotifs(token.user.id).then((data) => {
+      setNotifList(data);
+      //ignore typescript things
+    });
+  }, []);
 
   //For notif button callback see ".SimpleBadge.tsx Line 23"
   const clearNotif = () => {
@@ -68,9 +70,9 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   //Debugging
   useEffect(() => {
-    console.log("Notif List: {")
+    console.log("Notif List: {");
     console.log(notifList);
-    console.log("}")
+    console.log("}");
   }, [notifList]);
 
   console.log(token);
@@ -102,32 +104,7 @@ const Home: React.FC<HomeProps> = ({ token }) => {
   };
 
   const handleBecomeOrganizer = async () => {
-    try {
-      // Send a request to the server to become an organizer
-      const response = await fetch("/client.ts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: token.user.id,
-          message: "Please consider me as an organizer.",
-        }),
-      });
-
-      if (response.ok) {
-        alert(
-          "Your request to become an organizer has been submitted successfully."
-        );
-      } else {
-        alert("Failed to submit the request. Please try again later.");
-      }
-    } catch (error) {
-      console.error("Error submitting organizer request:", error);
-      alert(
-        "An error occurred while submitting the request. Please try again later."
-      );
-    }
+    requestOrganizer(token.user.id);
   };
 
   return (
