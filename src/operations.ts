@@ -290,7 +290,7 @@ export const isApproved = async (user_id: string) => {
     .select("event_id")
     .eq("user_id", user_id)
     .eq("is_accepted", true);
-
+  
   if (error) {
     console.log("CRUD Error: " + error.message);
     return null;
@@ -305,11 +305,12 @@ export const isApproved = async (user_id: string) => {
 
 export const isNotified = async (user_id: string) => {
   const { data, error } = await supabase
-    .from("attendees")
-    .select("event_id, is_accepted")
-    .eq("user_id", user_id)
-    .eq("notified", false)
-    .filter("is_accepted", "not.is", "true");
+  .from("attendees")
+  .select("event_id")
+  .eq("user_id", user_id)
+  .eq("notified", false)
+  .eq("is_accepted", true);
+  
 
   if (error) {
     console.log("CRUD Error: " + error.message);
@@ -325,3 +326,15 @@ export const isNotified = async (user_id: string) => {
 
   return [];
 };
+
+export const setNotification = async (user_id: string, event_id: string) => {
+  const { data, error } = await supabase
+            .from('attendees')
+            .update({ notified: true })
+            .eq('user_id', user_id)
+            .eq('event_id', event_id);
+            if (error) console.log("CRUD Error: " + error);
+    return data;
+}
+  
+
