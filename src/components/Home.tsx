@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Upvote from "@mui/icons-material/ThumbUpOutlined";
 import ResponsiveAppBar from "./ResponsiveAppBar";
 import IconButton from "@mui/material/IconButton";
-import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate, requestJoinEvent , createNotif, isApproved, isNotified} from "../operations";
+import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate, requestJoinEvent , setNotification, getEvent, createNotif, isApproved, isNotified} from "../operations";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../client";
 import { styled } from '@mui/material/styles';
@@ -43,11 +43,14 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   const handleInserts = (payload: any) => {
     console.log("Change received!", payload);
-    setNotifNumber(notifNumber + 1);
-    getNotifs(token.user.id).then((data) => {
-      setNotifList(data);
-      //ignore typescript things
-    });
+    const newNotification = payload?.new; 
+    if (newNotification) {
+      const isDuplicate = notifList.some(notification => notification.title === newNotification.title && notification.description === newNotification.description);
+      if (!isDuplicate) {
+        setNotifList(prevList => [...prevList, { title: newNotification.title, description: newNotification.description }]);
+        setNotifNumber(prevNumber => prevNumber + 1);
+      }
+    }
   };
 
   supabase
@@ -59,9 +62,42 @@ const Home: React.FC<HomeProps> = ({ token }) => {
     )
     .subscribe();
 
+    useEffect(() => {
+      const processedEventIds = new Set<number>();
+    
+      isNotified(token.user.id).then(async (eventIds: any[]) => {
+        for (const eventId of eventIds) {
+          const { event_id, is_accepted } = eventId;
+          
+          if (processedEventIds.has(event_id)) {
+            console.log('Event ID', event_id, 'already processed. Skipping notification creation.');
+            continue;
+          }
+    
+          console.log('Fetching event details for event ID:', event_id);
+          const eventDetailsArray = await getEvent(event_id);
+          console.log('Event Details Array:', eventDetailsArray);
+          
+          if (eventDetailsArray.length > 0) {
+            eventDetailsArray.forEach((eventDetail: any) => {
+              const { name, event_start } = eventDetail;
+              console.log("Event Request Update");
+              createNotif("Event Request Update", "Your request to join " + name + " on " + formatDate(event_start) + " has been accepted.", token.user.id);
+              setNotification(token.user.id, event_id);
+              processedEventIds.add(event_id); // Add event ID to processed set
+            });
+          } else {
+            console.error('No event details found for event ID:', event_id);
+          }
+        } 
+      }).catch((error) => {
+        console.error('Error fetching eventIds:', error.message);
+      });
+    }, [token.user.id]);
+
+
   useEffect(() => {
     getNotifs(token.user.id).then((data) => {
-      //check if isapproved then createnotif
       setNotifList(data);
       //ignore typescript things
     });
@@ -84,12 +120,11 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   //Dev Button Handler
   const handleTestButtonOnClick = async () => {
-    const notifiedEvents = await isNotified(token.user.id);
-    notifiedEvents.forEach(event => {
-  console.log("Event ID:", event.event_id);
-  console.log("Is Accepted:", event.is_accepted);
-});
-  };
+    
+    
+    };
+
+
   //show events on home and formatting the date
   useEffect(() => {
     const fetchEvents = async () => {
