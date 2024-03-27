@@ -48,6 +48,7 @@ export default function SignIn({ setToken }) {
         email: formdata.get("email"),
         password: formdata.get("password"),
       });
+
       console.log(data);
       setToken(data);
       if (error) throw error;
