@@ -3,9 +3,10 @@ import { useState, useEffect } from "react";
 import Upvote from "@mui/icons-material/ThumbUpOutlined";
 import ResponsiveAppBar from "./ResponsiveAppBar";
 import IconButton from "@mui/material/IconButton";
-import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator } from "../operations";
+import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate } from "../operations";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../client";
+import { styled } from '@mui/material/styles';
 
 //subject to change (ids and event redirect/popup/data)
 interface Notif {
@@ -17,9 +18,24 @@ interface HomeProps {
   token: any;
 }
 
+const CardWrapper = styled('div')({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '16px', 
+});
+
+const CardContainer = styled('div')({
+  backgroundColor: '#f0f0f0', 
+  width: '250px', 
+  height: '150px',
+  textAlign: 'center', 
+});
+
 const Home: React.FC<HomeProps> = ({ token }) => {
   const [notifNumber, setNotifNumber] = useState(0);
   const [notifList, setNotifList] = useState<Notif[]>([]);
+  const [events, setEvents] = useState([]);
 
   const handleInserts = (payload: any) => {
     console.log("Change received!", payload);
@@ -63,10 +79,30 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   //Dev Button Handler
   const handleTestButtonOnClick = () => {
-    //Add total unread notifs by 1
-    setNotifNumber(notifNumber + 1);
-    addNotif("Event1", "Desc1");
+    // //Add total unread notifs by 1
+    // setNotifNumber(notifNumber + 1);
+    // addNotif("Event1", "Desc1");
+    getEvents().then((events) => {
+      console.log(events); // Log the events array
+    }).catch((error) => {
+      console.error('Error fetching events:', error); // Log any errors that occur
+    });
   };
+  //show events on home and formatting the date
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const eventsData = await getEvents();
+        setEvents(eventsData.map(event => ({
+          ...event,
+          event_start: formatDate(event.event_start) 
+        }))); 
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   //Debugging
   useEffect(() => {
@@ -80,12 +116,14 @@ const Home: React.FC<HomeProps> = ({ token }) => {
   const handleJoinEvent = async (event_id: number) => { 
     const response = await requestOrganizer(token.user.id);
     console.log(response);
+    console.log(token.user.id);
     if (response) {
       alert('Request to join event has been submitted for approval.');
     } else {
       alert('Request already sent! Please wait for approval.');
     }
   }
+  
 
   //
   const handleBecomeOrganizer = async () => {
@@ -108,6 +146,7 @@ const Home: React.FC<HomeProps> = ({ token }) => {
       }
   };
 
+  
   return (
     <>
       <ResponsiveAppBar
@@ -124,23 +163,17 @@ const Home: React.FC<HomeProps> = ({ token }) => {
         justifyContent="center"
         alignItems="center"
       >
-        <h1> Event List </h1>
-        <Card>
-          <CardContent>
-            <h2> Event 1</h2>
-            <h4> Details chu chu chu</h4>
-            <IconButton aria-label="thumbs up">
-              <Upvote />
-            </IconButton>
-            <Button
-              variant="contained"
-              onClick={handleJoinEvent}
-            >
-              {" "}
-              Join Event{" "}
-            </Button>
-          </CardContent>
-        </Card>
+         <CardWrapper>
+        {events.map((event, index) => (
+          <CardContainer key={index}>
+            <CardContent>
+              <h2>{event.name}</h2>
+              <p>Event Start: {event.event_start}</p>
+              <p>Description: {event.description}</p>
+            </CardContent>
+          </CardContainer>
+        ))}
+      </CardWrapper>
         <Button
           variant="contained"
           onClick={handleBecomeOrganizer}

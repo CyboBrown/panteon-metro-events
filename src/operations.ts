@@ -92,6 +92,7 @@ export const getEvents = async () => {
   let { data, error } = await supabase
     .from("events")
     .select("*")
+    .eq("is_cancelled", false)
     .order("created_at", { ascending: false });
   if (error) console.log("CRUD Error: " + error);
   return data;
@@ -273,4 +274,13 @@ export const isOrganizer = async (user_id: string) => {
     console.error("Error:", error.message);
     return false;
   }
+};
+
+export const formatDate = (dateString) => {
+  const eventStartDate = new Date(dateString);
+  return eventStartDate.toLocaleDateString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric'
+  });
 };
