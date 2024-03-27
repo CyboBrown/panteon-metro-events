@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Upvote from "@mui/icons-material/ThumbUpOutlined";
 import ResponsiveAppBar from "./ResponsiveAppBar";
 import IconButton from "@mui/material/IconButton";
-import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate, requestJoinEvent } from "../operations";
+import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate, requestJoinEvent , createNotif, isApproved} from "../operations";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../client";
 import { styled } from '@mui/material/styles';
@@ -38,6 +38,8 @@ const Home: React.FC<HomeProps> = ({ token }) => {
   const [events, setEvents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 8;
+  
+  
 
   const handleInserts = (payload: any) => {
     console.log("Change received!", payload);
@@ -59,6 +61,7 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   useEffect(() => {
     getNotifs(token.user.id).then((data) => {
+      //check if isapproved then createnotif
       setNotifList(data);
       //ignore typescript things
     });
@@ -80,16 +83,8 @@ const Home: React.FC<HomeProps> = ({ token }) => {
   };
 
   //Dev Button Handler
-  const handleTestButtonOnClick = () => {
-    // //Add total unread notifs by 1
-    // setNotifNumber(notifNumber + 1);
-    // addNotif("Event1", "Desc1");
-    // getEvents().then((events) => {
-    //   console.log(events); // Log the events array
-    // }).catch((error) => {
-    //   console.error('Error fetching events:', error); // Log any errors that occur
-    // });
-    requestJoinEvent(token.user.id, 4);
+  const handleTestButtonOnClick = async () => {
+    console.log(isApproved(token.user.id));
   };
   //show events on home and formatting the date
   useEffect(() => {
@@ -114,43 +109,37 @@ const Home: React.FC<HomeProps> = ({ token }) => {
     console.log("}");
   }, [notifList]);
 
-  console.log(token);
-
   //
   const handleBecomeOrganizer = async () => {
       const response = await requestAdministrator(token.user.id);
       console.log(response);
       if(await isOrganizer(token.user.id) == true) {
-        setNotifNumber(notifNumber + 1);
-        addNotif("User Status", "Request to to become an Organizer has been approved!");
+        const notif = await createNotif("User Status", "Request to to become an Organizer has been accepted!", token.user.id);
+        alert('You are already an organizer!');
       } else if(await isOrganizer(token.user.id) == false) {
         setNotifNumber(notifNumber + 1);
-        addNotif("User Status", "Request to to become an Organizer has been rejected!");
+        const notif = await createNotif("User Status", "Request to to become an Organizer has been rejected!", token.user.id);
       } else if(await isOrganizer(token.user.id) == null) {
-        setNotifNumber(notifNumber + 1);
-        addNotif("User Status", "Request to to become an Organizer is pending!");
+        alert('Request is currently being reviewed. Please wait for approval.');
       } 
       else if (response) {
         alert('Request to become an organizer has been submitted for approval.');
       } else {
-        alert('Request already sent! Please wait for approval.');
+        alert ('Request already sent! Please wait for approval.');
       }
   };
 
-  const handleJoinEvent = async (event_id: number) => {
-    const response = await requestJoinEvent(token.user.id, event_id);
+  const handleJoinEvent = async (index: number) => {
+    const eventIds = events.map(event => event.id);
+    const userUUID = token.user.id;
+    const response = await requestJoinEvent(userUUID, eventIds[index]);
     console.log(response);
+    console.log(eventIds[index] + " , " +userUUID);
     if (response) {
       alert('Request to join event has been submitted for approval.');
     } else {
       alert('Request already sent! Please wait for approval.');
     }
-  }
-
-  const dbgger = async(event_id: number) => {
-    console.log(token.user.id + " "+ event_id.id);
-    const response = await requestJoinEvent(token.user.id, event_id);
-    console.log(token.user.id + " "+ event_id.description);
   }
 
   
@@ -182,41 +171,45 @@ const Home: React.FC<HomeProps> = ({ token }) => {
       <br/>
       <Grid
         container
-        spacing={2}
+        spacing={5}
         direction="row" 
         justifyContent="center"
         alignItems="center"
       >
         {currentEvents.map((event, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-            <CardContainer sx={{ mb: 2 }} id>
+          <Grid item xs={12} sm={6} md={4} lg={3} key={index} >
+            <CardContainer sx={{ mb: 2 }} sx={{
+              border: '1px solid black',
+              borderRadius: '4px',
+              padding: '16px',
+              boxSizing: 'border-box',
+            }}>
               <CardContent>
                 <h2>{event.name}</h2>
                 <p>Event Start: {event.event_start}</p>
                 <p>Description: {event.description}</p>
                 <Button
                   variant="contained"
-                  onClick={() => dbgger(event.id)}
+                  onClick={() => handleJoinEvent(index)}
                   sx={{ mt: 5 }}
                 >
-                  {" "}
-        Join Event{" "}
+        Join Event
       </Button>
               </CardContent>
             </CardContainer>
           </Grid>
         ))}
       </Grid>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px', padding: '0 20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px', padding: '0 20px', border: '10px',  }}>
         <Button
-          variant="contained"
+          variant="outlined"
           onClick={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
         >
           Previous
         </Button>
         <Button
-          variant="contained"
+          variant="outlined"
           onClick={() => paginate(currentPage + 1)}
           disabled={currentEvents.length < eventsPerPage}
         >
