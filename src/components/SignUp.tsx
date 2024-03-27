@@ -55,6 +55,16 @@ export default function SignUp() {
           },
         },
       });
+      const { data1, error1 } = await supabase
+        .from("users")
+        .insert([
+          {
+            firstname: formdata.get("firstName"),
+            lastname: formdata.get("lastName"),
+            auth_user_id: data.user.id,
+          },
+        ])
+        .select();
       console.log(data);
       if (error) throw error;
       navigate("/signin");

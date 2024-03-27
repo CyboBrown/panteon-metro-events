@@ -100,13 +100,12 @@ export const getEvents = async () => {
 
 // fetch user details by user_id
 export const getUser = async (user_id: string) => {
-  //   let { data, error } = await supabase
-  //     .from("users")
-  //     .select("*")
-  //     .eq("id", user_id);
-  //   if (error) console.log("CRUD Error: " + error);
-  //   return data;
-  return null;
+  let { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", user_id);
+  if (error) console.log("CRUD Error: " + error);
+  return data;
 };
 
 // fetch all notifications for the specified user
@@ -278,10 +277,10 @@ export const isOrganizer = async (user_id: string) => {
 
 export const formatDate = (dateString: Date) => {
   const eventStartDate = new Date(dateString);
-  return eventStartDate.toLocaleDateString('en-US', {
-    month: '2-digit',
-    day: '2-digit',
-    year: 'numeric'
+  return eventStartDate.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
   });
 };
 
@@ -306,22 +305,21 @@ export const isApproved = async (user_id: string) => {
 
 export const isNotified = async (user_id: string) => {
   const { data, error } = await supabase
-  .from("attendees")
-  .select("event_id, is_accepted")
-  .eq("user_id", user_id)
-  .eq("notified", false)
-  .filter('is_accepted', 'not.is', 'true');
-  
-    
+    .from("attendees")
+    .select("event_id, is_accepted")
+    .eq("user_id", user_id)
+    .eq("notified", false)
+    .filter("is_accepted", "not.is", "true");
+
   if (error) {
     console.log("CRUD Error: " + error.message);
     return null;
   }
-  
+
   if (data) {
     return data.map((row: any) => ({
       event_id: row.event_id,
-      is_accepted: row.is_accepted
+      is_accepted: row.is_accepted,
     }));
   }
 
