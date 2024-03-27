@@ -303,3 +303,27 @@ export const isApproved = async (user_id: string) => {
 
   return [];
 };
+
+export const isNotified = async (user_id: string) => {
+  const { data, error } = await supabase
+  .from("attendees")
+  .select("event_id, is_accepted")
+  .eq("user_id", user_id)
+  .eq("notified", false)
+  .filter('is_accepted', 'not.is', 'true');
+  
+    
+  if (error) {
+    console.log("CRUD Error: " + error.message);
+    return null;
+  }
+  
+  if (data) {
+    return data.map((row: any) => ({
+      event_id: row.event_id,
+      is_accepted: row.is_accepted
+    }));
+  }
+
+  return [];
+};
