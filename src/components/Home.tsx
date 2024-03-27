@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Upvote from "@mui/icons-material/ThumbUpOutlined";
 import ResponsiveAppBar from "./ResponsiveAppBar";
 import IconButton from "@mui/material/IconButton";
-import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate, requestJoinEvent , createNotif, isApproved} from "../operations";
+import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate, requestJoinEvent , createNotif, isApproved, isNotified} from "../operations";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../client";
 import { styled } from '@mui/material/styles';
@@ -84,7 +84,11 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   //Dev Button Handler
   const handleTestButtonOnClick = async () => {
-    console.log(isApproved(token.user.id));
+    const notifiedEvents = await isNotified(token.user.id);
+    notifiedEvents.forEach(event => {
+  console.log("Event ID:", event.event_id);
+  console.log("Is Accepted:", event.is_accepted);
+});
   };
   //show events on home and formatting the date
   useEffect(() => {
