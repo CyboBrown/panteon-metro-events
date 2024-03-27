@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Upvote from "@mui/icons-material/ThumbUpOutlined";
 import ResponsiveAppBar from "./ResponsiveAppBar";
 import IconButton from "@mui/material/IconButton";
-import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate } from "../operations";
+import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate, requestJoinEvent } from "../operations";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../client";
 import { styled } from '@mui/material/styles';
@@ -36,6 +36,8 @@ const Home: React.FC<HomeProps> = ({ token }) => {
   const [notifNumber, setNotifNumber] = useState(0);
   const [notifList, setNotifList] = useState<Notif[]>([]);
   const [events, setEvents] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 8;
 
   const handleInserts = (payload: any) => {
     console.log("Change received!", payload);
@@ -82,11 +84,12 @@ const Home: React.FC<HomeProps> = ({ token }) => {
     // //Add total unread notifs by 1
     // setNotifNumber(notifNumber + 1);
     // addNotif("Event1", "Desc1");
-    getEvents().then((events) => {
-      console.log(events); // Log the events array
-    }).catch((error) => {
-      console.error('Error fetching events:', error); // Log any errors that occur
-    });
+    // getEvents().then((events) => {
+    //   console.log(events); // Log the events array
+    // }).catch((error) => {
+    //   console.error('Error fetching events:', error); // Log any errors that occur
+    // });
+    requestJoinEvent(token.user.id, 4);
   };
   //show events on home and formatting the date
   useEffect(() => {
@@ -112,18 +115,6 @@ const Home: React.FC<HomeProps> = ({ token }) => {
   }, [notifList]);
 
   console.log(token);
-  //
-  const handleJoinEvent = async (event_id: number) => { 
-    const response = await requestOrganizer(token.user.id);
-    console.log(response);
-    console.log(token.user.id);
-    if (response) {
-      alert('Request to join event has been submitted for approval.');
-    } else {
-      alert('Request already sent! Please wait for approval.');
-    }
-  }
-  
 
   //
   const handleBecomeOrganizer = async () => {
@@ -146,7 +137,29 @@ const Home: React.FC<HomeProps> = ({ token }) => {
       }
   };
 
+  const handleJoinEvent = async (event_id: number) => {
+    const response = await requestJoinEvent(token.user.id, event_id);
+    console.log(response);
+    if (response) {
+      alert('Request to join event has been submitted for approval.');
+    } else {
+      alert('Request already sent! Please wait for approval.');
+    }
+  }
+
+  const dbgger = async(event_id: number) => {
+    console.log(token.user.id + " "+ event_id.id);
+    const response = await requestJoinEvent(token.user.id, event_id);
+    console.log(token.user.id + " "+ event_id.description);
+  }
+
   
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   return (
     <>
       <ResponsiveAppBar
@@ -156,33 +169,60 @@ const Home: React.FC<HomeProps> = ({ token }) => {
       />
       <p>{"Welcome, " + token.user.user_metadata.first_name}</p>
       <button onClick={handleTestButtonOnClick}>Add Notif Button</button>
+      <Button
+        variant="contained"
+        onClick={handleBecomeOrganizer}
+        sx={{ mt: 5 }}
+      >
+        {" "}
+        Become an Organizer{" "}
+      </Button>
+      <br/>
+      <br/>
+      <br/>
       <Grid
         container
         spacing={2}
-        direction="column"
+        direction="row" 
         justifyContent="center"
         alignItems="center"
       >
-         <CardWrapper>
-        {events.map((event, index) => (
-          <CardContainer key={index}>
-            <CardContent>
-              <h2>{event.name}</h2>
-              <p>Event Start: {event.event_start}</p>
-              <p>Description: {event.description}</p>
-            </CardContent>
-          </CardContainer>
+        {currentEvents.map((event, index) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            <CardContainer sx={{ mb: 2 }} id>
+              <CardContent>
+                <h2>{event.name}</h2>
+                <p>Event Start: {event.event_start}</p>
+                <p>Description: {event.description}</p>
+                <Button
+                  variant="contained"
+                  onClick={() => dbgger(event.id)}
+                  sx={{ mt: 5 }}
+                >
+                  {" "}
+        Join Event{" "}
+      </Button>
+              </CardContent>
+            </CardContainer>
+          </Grid>
         ))}
-      </CardWrapper>
+      </Grid>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px', padding: '0 20px' }}>
         <Button
           variant="contained"
-          onClick={handleBecomeOrganizer}
-          sx={{ mt: 5 }}
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
         >
-          {" "}
-          Become an Organizer{" "}
+          Previous
         </Button>
-      </Grid>
+        <Button
+          variant="contained"
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentEvents.length < eventsPerPage}
+        >
+          Next
+        </Button>
+      </div>
     </>
   );
 };
