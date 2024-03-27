@@ -276,11 +276,30 @@ export const isOrganizer = async (user_id: string) => {
   }
 };
 
-export const formatDate = (dateString) => {
+export const formatDate = (dateString: Date) => {
   const eventStartDate = new Date(dateString);
   return eventStartDate.toLocaleDateString('en-US', {
     month: '2-digit',
     day: '2-digit',
     year: 'numeric'
   });
+};
+
+export const isApproved = async (user_id: string) => {
+  const { data, error } = await supabase
+    .from("attendees")
+    .select("event_id")
+    .eq("user_id", user_id)
+    .eq("is_accepted", true);
+
+  if (error) {
+    console.log("CRUD Error: " + error.message);
+    return null;
+  }
+
+  if (data) {
+    return data.map((row: any) => row.event_id);
+  }
+
+  return [];
 };
