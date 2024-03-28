@@ -8,6 +8,7 @@ import "./App.css";
 import { supabase } from "./client";
 import Organizer from "./components/Organizer";
 import EventForm from "./components/CreateEvent";
+import BasicModal from "./components/Sample";
 
 export default function App() {
   const [token, setToken] = useState(false);
@@ -36,7 +37,7 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           {token ? <Route path="/home" element={<Home token={token} />} /> : ""}
           <Route path="/organizer" element={<Organizer/>}/>
-          <Route path="/event" element={<EventForm/>}/>
+          <Route path="/sample" element={<BasicModal/>}/>
         </Routes>
       </BrowserRouter>
     </>
