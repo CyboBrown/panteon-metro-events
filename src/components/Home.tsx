@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Upvote from "@mui/icons-material/ThumbUpOutlined";
 import ResponsiveAppBar from "./ResponsiveAppBar";
 import IconButton from "@mui/material/IconButton";
-import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate, requestJoinEvent , setNotification, getEvent, createNotif, isApproved, isNotified} from "../operations";
+import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEvents, formatDate, requestJoinEvent , setNotification, getEvent, createNotif, isApproved, isNotified, isAdministrator} from "../operations";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../client";
 import { styled } from '@mui/material/styles';
@@ -37,6 +37,7 @@ const CardContainer = styled('div')({
 const Home: React.FC<HomeProps> = ({ token }) => {
   const [notifNumber, setNotifNumber] = useState(0);
   const [isOrganizerStatus, setIsOrganizerStatus] = useState(null);
+  const [isAdministratorStatus, setAdministratorStatus] = useState(null);
   const [notifList, setNotifList] = useState<Notif[]>([]);
   const [events, setEvents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -105,11 +106,26 @@ const Home: React.FC<HomeProps> = ({ token }) => {
           setIsOrganizerStatus(status);
         } catch (error) {
           console.error('Error checking organizer status:', error);
-          setIsOrganizerStatus(null); // Set status to null in case of error
+          setIsOrganizerStatus(null);
         }
       };
   
       fetchOrganizerStatus();
+    }, [token.user.id]);
+
+    //needs editing
+    useEffect(() => {
+      const fetchAdministratorStatus = async () => {
+        try {
+          const status = await isAdministrator(token.user.id);
+          setAdministratorStatus(status);
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          setAdministratorStatus(null);
+        }
+      };
+  
+      fetchAdministratorStatus();
     }, [token.user.id]);
 
   useEffect(() => {
@@ -136,8 +152,6 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   //Dev Button Handler
   const handleTestButtonOnClick = async () => {
-    
-    
     };
 
 
@@ -213,6 +227,17 @@ const Home: React.FC<HomeProps> = ({ token }) => {
       />
       <p>{"Welcome, " + token.user.user_metadata.first_name}</p>
       <div>
+      {isAdministratorStatus === true && (
+        <p>You are an admin.</p>
+      )}
+      {isAdministratorStatus === false && (
+        <p>You are not an admin.</p>
+      )}
+      {isAdministratorStatus === null && (
+        <p>Admin request waiting for approval.</p>
+      )}
+      </div>
+      <div>
       {isOrganizerStatus === true && (
         <p>You are an organizer.</p>
       )}
@@ -236,7 +261,7 @@ const Home: React.FC<HomeProps> = ({ token }) => {
       )}
       {isOrganizerStatus && ( 
         <Link to="/organizer">
-          <Button variant="contained" enabled sx={{ mt: 5 }}>
+          <Button variant="contained" sx={{ mt: 5 }}>
             Go to Events List
           </Button>
         </Link>
