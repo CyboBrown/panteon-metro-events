@@ -30,7 +30,7 @@ const CardWrapper = styled('div')({
 const CardContainer = styled('div')({
   backgroundColor: '#f0f0f0', 
   width: '250px', 
-  height: '150px',
+  height: '200px',
   textAlign: 'center', 
 });
 
@@ -272,14 +272,14 @@ const Home: React.FC<HomeProps> = ({ token }) => {
       <br/>
       <Grid
         container
-        spacing={5}
+        spacing={8}
         direction="row" 
         justifyContent="center"
         alignItems="center"
       >
         {currentEvents.map((event, index) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={index} >
-            <CardContainer sx={{ mb: 2 }} sx={{
+            <CardContainer sx={{ mb: 5 }} sx={{
               border: '1px solid black',
               borderRadius: '4px',
               padding: '16px',
@@ -289,15 +289,25 @@ const Home: React.FC<HomeProps> = ({ token }) => {
                 <h2>{event.name}</h2>
                 <p>Event Start: {event.event_start}</p>
                 <p>Description: {event.description}</p>
-                <Button
-                  variant="contained"
-                  onClick={() => handleJoinEvent(index)}
-                  sx={{ mt: 5 }}
-                >
-        Join Event
-      </Button>
               </CardContent>
             </CardContainer>
+            <div style={{ display: 'flex', justifyContent: 'left' }}>
+              <Button
+                variant="contained"
+                onClick={() => handleJoinEvent(index)}
+                sx={{ mt: 0 }}
+              >
+                Join Event
+              </Button>
+              {/* <Button
+                variant="contained"
+                disabled
+                onClick={() => handleJoinEvent(index)}
+                sx={{ mt: 0 }}
+              >
+              <p>Upvote Now   </p>
+              </Button> */}
+            </div>
           </Grid>
         ))}
       </Grid>
