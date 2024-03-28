@@ -7,6 +7,8 @@ import { getNotifs, requestOrganizer, isOrganizer, requestAdministrator, getEven
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../client";
 import { styled } from '@mui/material/styles';
+import { Link } from 'react-router-dom';
+
 
 //subject to change (ids and event redirect/popup/data)
 interface Notif {
@@ -215,21 +217,31 @@ const Home: React.FC<HomeProps> = ({ token }) => {
         <p>You are an organizer.</p>
       )}
       {isOrganizerStatus === false && (
-        <p>Approval request was denied.</p>
+        <p>You are not an organizer.</p>
       )}
       {isOrganizerStatus === null && (
         <p>Organizer request waiting for approval.</p>
       )}
     </div>
       <button onClick={handleTestButtonOnClick}>Add Notif Button</button>
-      <Button
-        variant="contained"
-        onClick={handleBecomeOrganizer}
-        sx={{ mt: 5 }}
-      >
-        {" "}
-        Become an Organizer{" "}
-      </Button>
+      <div>
+      {!isOrganizerStatus && (
+        <Button
+          variant="contained"
+          onClick={handleBecomeOrganizer}
+          sx={{ mt: 5 }}
+        >
+          Become an Organizer
+        </Button>
+      )}
+      {isOrganizerStatus && ( 
+        <Link to="/organizer">
+          <Button variant="contained" enabled sx={{ mt: 5 }}>
+            Go to Events List
+          </Button>
+        </Link>
+      )}
+    </div>
       <br/>
       <br/>
       <br/>
