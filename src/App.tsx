@@ -31,7 +31,8 @@ export default function App() {
           <Route path="/signin" element={<SignIn setToken={setToken} />} />
           <Route path="/signup" element={<SignUp />} />
           {token ? <Route path="/home" element={<Home token={token} />} /> : ""}
-          <Route path="/organizer" element={<Organizer/>}/>
+          {token ? <Route path="/organizer" element={<Organizer token={token} />}/> : ""}
+          
         </Routes>
       </BrowserRouter>
     </>
