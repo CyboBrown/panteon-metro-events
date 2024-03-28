@@ -5,12 +5,12 @@ import Index from "./components/Index";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import "./App.css";
-import { supabase } from "./client";
 import Organizer from "./components/Organizer";
-
+import { getUser } from "./operations";
 
 export default function App() {
   const [token, setToken] = useState(false);
+  const [userInfo, setUserInfo] = useState();
 
   if (token) {
     sessionStorage.setItem("token", JSON.stringify(token));
@@ -31,7 +31,7 @@ export default function App() {
           <Route path="/signin" element={<SignIn setToken={setToken} />} />
           <Route path="/signup" element={<SignUp />} />
           {token ? <Route path="/home" element={<Home token={token} />} /> : ""}
-          <Route path="/organizer" element={<Organizer/>}/>
+          <Route path="/organizer" element={<Organizer />} />
         </Routes>
       </BrowserRouter>
     </>

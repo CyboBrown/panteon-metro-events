@@ -103,7 +103,8 @@ export const getUser = async (user_id: string) => {
   let { data, error } = await supabase
     .from("users")
     .select("*")
-    .eq("id", user_id);
+    .eq("auth_user_id", user_id)
+    .single();
   if (error) console.log("CRUD Error: " + error);
   return data;
 };
@@ -161,6 +162,14 @@ export const respondAdministratorRequest = async (
     })
     .eq("user_id", user_id)
     .select();
+  if (is_accepted) {
+    const { data, error } = await supabase
+      .from("users")
+      .update({
+        is_administrator: true,
+      })
+      .eq("auth_user_id", user_id);
+  }
   if (error) console.log("CRUD Error: " + error);
   return data;
 };
@@ -195,6 +204,14 @@ export const respondOrganizerRequest = async (
     })
     .eq("user_id", user_id)
     .select();
+  if (is_accepted) {
+    const { data, error } = await supabase
+      .from("users")
+      .update({
+        is_organizer: true,
+      })
+      .eq("auth_user_id", user_id);
+  }
   if (error) console.log("CRUD Error: " + error);
   return data;
 };
@@ -290,7 +307,7 @@ export const isApproved = async (user_id: string) => {
     .select("event_id")
     .eq("user_id", user_id)
     .eq("is_accepted", true);
-  
+
   if (error) {
     console.log("CRUD Error: " + error.message);
     return null;
@@ -305,12 +322,11 @@ export const isApproved = async (user_id: string) => {
 
 export const isNotified = async (user_id: string) => {
   const { data, error } = await supabase
-  .from("attendees")
-  .select("event_id")
-  .eq("user_id", user_id)
-  .eq("notified", false)
-  .eq("is_accepted", true);
-  
+    .from("attendees")
+    .select("event_id")
+    .eq("user_id", user_id)
+    .eq("notified", false)
+    .eq("is_accepted", true);
 
   if (error) {
     console.log("CRUD Error: " + error.message);
@@ -329,12 +345,10 @@ export const isNotified = async (user_id: string) => {
 
 export const setNotification = async (user_id: string, event_id: string) => {
   const { data, error } = await supabase
-            .from('attendees')
-            .update({ notified: true })
-            .eq('user_id', user_id)
-            .eq('event_id', event_id);
-            if (error) console.log("CRUD Error: " + error);
-    return data;
-}
-  
-
+    .from("attendees")
+    .update({ notified: true })
+    .eq("user_id", user_id)
+    .eq("event_id", event_id);
+  if (error) console.log("CRUD Error: " + error);
+  return data;
+};
