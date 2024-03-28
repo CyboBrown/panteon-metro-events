@@ -364,3 +364,30 @@ export const setNotification = async (user_id: string, event_id: string) => {
   if (error) console.log("CRUD Error: " + error);
   return data;
 };
+
+export const isAdministrator = async (user_id: string): Promise<boolean | null> => {
+  try {
+    const { data, error } = await supabase
+      .from("administrators")
+      .select("is_accepted")
+      .eq("user_id", user_id)
+      .single();
+
+    if (error) {
+      console.log("CRUD Error: " + error.message);
+      return false;
+    }
+    if (data) {
+      if (data && data.is_accepted === true) {
+        return true;
+      } else if (data && data.is_accepted === false) {
+        return false;
+      } else {
+        return false;
+      } 
+    }
+  } catch (error) {
+    console.error("Error:", error.message);
+    return false;
+  }
+};
