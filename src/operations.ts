@@ -125,7 +125,7 @@ export const getNotifs = async (user_id: string) => {
 // fetch organizer details
 export const getOrganizer = async (user_id: string) => {
   let { data, error } = await supabase
-    .from("administrators")
+    .from("organizers")
     .select("id")
     .eq("user_id", user_id)
   if (error) console.log("CRUD Error: " + error);
@@ -278,7 +278,7 @@ export const upvoteEvent = async (user_id: string, event_id: number) => {
 export const isOrganizer = async (user_id: string) => {
   try {
     const { data, error } = await supabase
-      .from("administrators")
+      .from("organizers")
       .select("is_accepted")
       .eq("user_id", user_id)
       .single();

@@ -34,6 +34,7 @@ const CardContainer = styled('div')({
 
 const Home: React.FC<HomeProps> = ({ token }) => {
   const [notifNumber, setNotifNumber] = useState(0);
+  const [isOrganizerStatus, setIsOrganizerStatus] = useState(null);
   const [notifList, setNotifList] = useState<Notif[]>([]);
   const [events, setEvents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,6 +96,19 @@ const Home: React.FC<HomeProps> = ({ token }) => {
       });
     }, [token.user.id]);
 
+    useEffect(() => {
+      const fetchOrganizerStatus = async () => {
+        try {
+          const status = await isOrganizer(token.user.id);
+          setIsOrganizerStatus(status);
+        } catch (error) {
+          console.error('Error checking organizer status:', error);
+          setIsOrganizerStatus(null); // Set status to null in case of error
+        }
+      };
+  
+      fetchOrganizerStatus();
+    }, [token.user.id]);
 
   useEffect(() => {
     getNotifs(token.user.id).then((data) => {
@@ -150,7 +164,7 @@ const Home: React.FC<HomeProps> = ({ token }) => {
 
   //
   const handleBecomeOrganizer = async () => {
-      const response = await requestAdministrator(token.user.id);
+      const response = await requestOrganizer(token.user.id);
       console.log(response);
       if(await isOrganizer(token.user.id) == true) {
         const notif = await createNotif("User Status", "Request to to become an Organizer has been accepted!", token.user.id);
@@ -196,6 +210,17 @@ const Home: React.FC<HomeProps> = ({ token }) => {
         notifList={notifList}
       />
       <p>{"Welcome, " + token.user.user_metadata.first_name}</p>
+      <div>
+      {isOrganizerStatus === true && (
+        <p>You are an organizer.</p>
+      )}
+      {isOrganizerStatus === false && (
+        <p>Approval request was denied.</p>
+      )}
+      {isOrganizerStatus === null && (
+        <p>Organizer request waiting for approval.</p>
+      )}
+    </div>
       <button onClick={handleTestButtonOnClick}>Add Notif Button</button>
       <Button
         variant="contained"

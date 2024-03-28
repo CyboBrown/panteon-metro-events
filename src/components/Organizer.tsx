@@ -25,7 +25,7 @@ export default function Organizer({token}) {
   const [eventDescription, setEventDescription] = useState('');
   const [eventStartDate, setEventStartDate] = useState('');
   const [eventEndDate, setEventEndDate] = useState('');
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(token.user.id);
 
   // useEffect(() => {
   //   const fetchEvents = async () => {
