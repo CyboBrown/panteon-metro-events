@@ -5,12 +5,12 @@ import Index from "./components/Index";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import "./App.css";
-import { supabase } from "./client";
 import Organizer from "./components/Organizer";
-
+import { getUser } from "./operations";
 
 export default function App() {
   const [token, setToken] = useState(false);
+  const [userInfo, setUserInfo] = useState();
 
   if (token) {
     sessionStorage.setItem("token", JSON.stringify(token));
