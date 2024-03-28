@@ -24,10 +24,6 @@ export default function App() {
     }
   }, []);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
-
   return (
     <>
       <BrowserRouter>

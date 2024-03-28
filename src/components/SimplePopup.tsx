@@ -15,17 +15,6 @@ interface SimplePopupProp {
 
 const SimplePopup: React.FC<SimplePopupProp> = ({ anchor, open, id, notifList }) => {
 
-  //   Some code subject to change and deletion
-  
-  //   const [anchor, setAnchor] = React.useState<null | HTMLElement>(null);
-
-  //   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-  //     setAnchor(anchor ? null : event.currentTarget);
-  //   };
-
-  //   const open = Boolean(anchor);
-  //   const id = open ? 'simple-popup' : undefined;
-
   const reversedNotifList = [...notifList].reverse();
 
   return (
