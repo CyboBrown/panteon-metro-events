@@ -27,7 +27,8 @@ export const createEvent = async (
   name: string,
   description: string,
   event_start: string,
-  created_by: number
+  event_end: string,
+  created_by: number,
 ) => {
   // You can add more event information here (and in supabase)
   const { data, error } = await supabase
@@ -37,6 +38,7 @@ export const createEvent = async (
         name: name,
         description: description,
         event_start: event_start,
+        event_end: event_end,
         created_by: created_by,
       },
     ])
@@ -119,6 +121,16 @@ export const getNotifs = async (user_id: string) => {
   if (error) console.log("CRUD Error: " + error);
   return data;
 };
+
+// fetch organizer details
+export const getOrganizer = async (user_id: string) => {
+  let { data, error } = await supabase
+    .from("administrators")
+    .select("id")
+    .eq("user_id", user_id)
+  if (error) console.log("CRUD Error: " + error);
+  return data;
+}
 
 // user requests for administrator role
 export const requestAdministrator = async (user_id: string) => {
